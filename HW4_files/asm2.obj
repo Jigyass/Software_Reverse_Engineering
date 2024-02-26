@@ -612,120 +612,133 @@ Disassembly of section .text:
     121b:	f3 0f 1e fa          	endbr64 
     121f:	55                   	push   %rbp
     1220:	48 89 e5             	mov    %rsp,%rbp
-    1223:	48 81 ec e0 0b 00 00 	sub    $0xbe0,%rsp
-    122a:	89 bd 2c f4 ff ff    	mov    %edi,-0xbd4(%rbp)
-    1230:	48 89 b5 20 f4 ff ff 	mov    %rsi,-0xbe0(%rbp)
+    1223:	48 81 ec e0 0b 00 00 	sub    $0xbe0,%rsp            # assign a space of 3040 bytes on the stack
+    122a:	89 bd 2c f4 ff ff    	mov    %edi,-0xbd4(%rbp)      # argc to 0xbd4
+    1230:	48 89 b5 20 f4 ff ff 	mov    %rsi,-0xbe0(%rbp)      # argv to 0xbe0
     1237:	64 48 8b 04 25 28 00 	mov    %fs:0x28,%rax
     123e:	00 00 
     1240:	48 89 45 f8          	mov    %rax,-0x8(%rbp)
-    1244:	31 c0                	xor    %eax,%eax
-    1246:	83 bd 2c f4 ff ff 01 	cmpl   $0x1,-0xbd4(%rbp)
+    1244:	31 c0                	xor    %eax,%eax              # ????NO IDEA
+    1246:	83 bd 2c f4 ff ff 01 	cmpl   $0x1,-0xbd4(%rbp)      # argc comparison to 1(Possibly check if there is more than one argument)
     124d:	7f 19                	jg     1268 <main+0x4d>
     124f:	48 8d 05 ae 0d 00 00 	lea    0xdae(%rip),%rax        # 2004 <_IO_stdin_used+0x4>
     1256:	48 89 c7             	mov    %rax,%rdi
     1259:	e8 42 fe ff ff       	call   10a0 <puts@plt>
     125e:	bf 00 00 00 00       	mov    $0x0,%edi
     1263:	e8 88 fe ff ff       	call   10f0 <exit@plt>
-    1268:	48 8b 85 20 f4 ff ff 	mov    -0xbe0(%rbp),%rax
-    126f:	48 83 c0 08          	add    $0x8,%rax
-    1273:	48 8b 00             	mov    (%rax),%rax
-    1276:	48 89 c7             	mov    %rax,%rdi
-    1279:	e8 62 fe ff ff       	call   10e0 <atoi@plt>
-    127e:	89 85 3c f4 ff ff    	mov    %eax,-0xbc4(%rbp)
-    1284:	81 bd 3c f4 ff ff e8 	cmpl   $0x3e8,-0xbc4(%rbp)
+    1268:	48 8b 85 20 f4 ff ff 	mov    -0xbe0(%rbp),%rax      # access the array argv
+    126f:	48 83 c0 08          	add    $0x8,%rax              # move the pointer to argv[1]
+    1273:	48 8b 00             	mov    (%rax),%rax            # moves the contents at the address to the register rax
+    1276:	48 89 c7             	mov    %rax,%rdi              # move contents of rax(argv[1]) to rdi, since rdi is the register at which the call will check for an argument
+    1279:	e8 62 fe ff ff       	call   10e0 <atoi@plt>        # argument to integer function call, the argument will be checked at rdi
+    127e:	89 85 3c f4 ff ff    	mov    %eax,-0xbc4(%rbp)      # %eax holds the return from the function call, which is being assigned a local_var1
+
+
+    1284:	81 bd 3c f4 ff ff e8 	cmpl   $0x3e8,-0xbc4(%rbp)    # compares local_var1 to 1000
     128b:	03 00 00 
-    128e:	7e 34                	jle    12c4 <main+0xa9>
-    1290:	8b 85 3c f4 ff ff    	mov    -0xbc4(%rbp),%eax
-    1296:	89 c7                	mov    %eax,%edi
-    1298:	e8 4c ff ff ff       	call   11e9 <func1>
-    129d:	89 85 34 f4 ff ff    	mov    %eax,-0xbcc(%rbp)
-    12a3:	8b 85 34 f4 ff ff    	mov    -0xbcc(%rbp),%eax
-    12a9:	89 c6                	mov    %eax,%esi
+    128e:	7e 34                	jle    12c4 <main+0xa9>       # if lesser than 1000, then move to the next if statement
+    1290:	8b 85 3c f4 ff ff    	mov    -0xbc4(%rbp),%eax      # moves local_var1 to eax
+    1296:	89 c7                	mov    %eax,%edi              # moves eax to edi to prepare for calling func1
+    1298:	e8 4c ff ff ff       	call   11e9 <func1>           # function call
+    129d:	89 85 34 f4 ff ff    	mov    %eax,-0xbcc(%rbp)      # save function return value to local_var2
+    12a3:	8b 85 34 f4 ff ff    	mov    -0xbcc(%rbp),%eax      # move local_var2 to eax
+    12a9:	89 c6                	mov    %eax,%esi              # move eax to edi for function call?
     12ab:	48 8d 05 6e 0d 00 00 	lea    0xd6e(%rip),%rax        # 2020 <_IO_stdin_used+0x20>
-    12b2:	48 89 c7             	mov    %rax,%rdi
-    12b5:	b8 00 00 00 00       	mov    $0x0,%eax
-    12ba:	e8 11 fe ff ff       	call   10d0 <printf@plt>
-    12bf:	e9 61 02 00 00       	jmp    1525 <main+0x30a>
-    12c4:	81 bd 3c f4 ff ff f4 	cmpl   $0x1f4,-0xbc4(%rbp)
+    12b2:	48 89 c7             	mov    %rax,%rdi              # move rax to rdi for function call?
+    12b5:	b8 00 00 00 00       	mov    $0x0,%eax              # sets eax to NULL
+    12ba:	e8 11 fe ff ff       	call   10d0 <printf@plt>      # funnction call to printf, since rdi and esi is used, there are two arguments passed
+    12bf:	e9 61 02 00 00       	jmp    1525 <main+0x30a>      # unconditional jump to outside if block
+
+
+    12c4:	81 bd 3c f4 ff ff f4 	cmpl   $0x1f4,-0xbc4(%rbp)    # compare local_var1 to 500
     12cb:	01 00 00 
-    12ce:	7e 41                	jle    1311 <main+0xf6>
-    12d0:	81 bd 3c f4 ff ff 58 	cmpl   $0x258,-0xbc4(%rbp)
+    12ce:	7e 41                	jle    1311 <main+0xf6>       # jump to next if block if lesser
+    12d0:	81 bd 3c f4 ff ff 58 	cmpl   $0x258,-0xbc4(%rbp)    # compare local_var1 to 600(nested if)
     12d7:	02 00 00 
-    12da:	75 21                	jne    12fd <main+0xe2>
-    12dc:	8b 85 3c f4 ff ff    	mov    -0xbc4(%rbp),%eax
-    12e2:	89 c6                	mov    %eax,%esi
+    12da:	75 21                	jne    12fd <main+0xe2>       # if local_var is not 600 jump to a location
+    12dc:	8b 85 3c f4 ff ff    	mov    -0xbc4(%rbp),%eax      # move local_var1 to eax
+    12e2:	89 c6                	mov    %eax,%esi              # eax to esi for function call?
     12e4:	48 8d 05 3c 0d 00 00 	lea    0xd3c(%rip),%rax        # 2027 <_IO_stdin_used+0x27>
-    12eb:	48 89 c7             	mov    %rax,%rdi
-    12ee:	b8 00 00 00 00       	mov    $0x0,%eax
-    12f3:	e8 d8 fd ff ff       	call   10d0 <printf@plt>
-    12f8:	e9 28 02 00 00       	jmp    1525 <main+0x30a>
+    12eb:	48 89 c7             	mov    %rax,%rdi              # this is a print statemetn
+    12ee:	b8 00 00 00 00       	mov    $0x0,%eax              # clear eax
+    12f3:	e8 d8 fd ff ff       	call   10d0 <printf@plt>      #function call to print(printf("Message: %d, local_var1") since esi and rdi are used
+    12f8:	e9 28 02 00 00       	jmp    1525 <main+0x30a>      # jump to outside the if blocks
     12fd:	48 8d 05 2a 0d 00 00 	lea    0xd2a(%rip),%rax        # 202e <_IO_stdin_used+0x2e>
-    1304:	48 89 c7             	mov    %rax,%rdi
-    1307:	e8 94 fd ff ff       	call   10a0 <puts@plt>
-    130c:	e9 14 02 00 00       	jmp    1525 <main+0x30a>
-    1311:	81 bd 3c f4 ff ff c8 	cmpl   $0xc8,-0xbc4(%rbp)
+    1304:	48 89 c7             	mov    %rax,%rdi              # loading some message into rdi for puts
+    1307:	e8 94 fd ff ff       	call   10a0 <puts@plt>        # function call to puts 
+    130c:	e9 14 02 00 00       	jmp    1525 <main+0x30a>      # jump to outside the if blocks
+
+
+
+    1311:	81 bd 3c f4 ff ff c8 	cmpl   $0xc8,-0xbc4(%rbp)     # Compare local_var1 to 200
     1318:	00 00 00 
-    131b:	7e 5f                	jle    137c <main+0x161>
-    131d:	c7 85 38 f4 ff ff 00 	movl   $0x0,-0xbc8(%rbp)
+    131b:	7e 5f                	jle    137c <main+0x161>      # If lesser than or equal to 200, jump to next if
+    131d:	c7 85 38 f4 ff ff 00 	movl   $0x0,-0xbc8(%rbp)      # Set a local variable to 0, assuming its counter variable temp
     1324:	00 00 00 
-    1327:	eb 24                	jmp    134d <main+0x132>
-    1329:	8b 85 3c f4 ff ff    	mov    -0xbc4(%rbp),%eax
-    132f:	23 85 38 f4 ff ff    	and    -0xbc8(%rbp),%eax
-    1335:	89 c2                	mov    %eax,%edx
-    1337:	8b 85 38 f4 ff ff    	mov    -0xbc8(%rbp),%eax
-    133d:	48 98                	cltq   
-    133f:	89 94 85 40 f4 ff ff 	mov    %edx,-0xbc0(%rbp,%rax,4)
-    1346:	83 85 38 f4 ff ff 01 	addl   $0x1,-0xbc8(%rbp)
-    134d:	8b 85 38 f4 ff ff    	mov    -0xbc8(%rbp),%eax
-    1353:	3b 85 3c f4 ff ff    	cmp    -0xbc4(%rbp),%eax
-    1359:	7c ce                	jl     1329 <main+0x10e>
-    135b:	8b 85 d0 f5 ff ff    	mov    -0xa30(%rbp),%eax
-    1361:	89 c6                	mov    %eax,%esi
+    1327:	eb 24                	jmp    134d <main+0x132>      # jump to loop condition check, while loop
+    1329:	8b 85 3c f4 ff ff    	mov    -0xbc4(%rbp),%eax      # local_var1 to eax
+    132f:	23 85 38 f4 ff ff    	and    -0xbc8(%rbp),%eax      # and between temp and local_var1
+    1335:	89 c2                	mov    %eax,%edx              # move eax to edx
+    1337:	8b 85 38 f4 ff ff    	mov    -0xbc8(%rbp),%eax      # move temp to eax
+    133d:	48 98                	cltq                          # convert long to quad, eax to rax
+    133f:	89 94 85 40 f4 ff ff 	mov    %edx,-0xbc0(%rbp,%rax,4) # Access the array at i(rax) 4 bc integer
+    1346:	83 85 38 f4 ff ff 01 	addl   $0x1,-0xbc8(%rbp)      # temp++;
+    134d:	8b 85 38 f4 ff ff    	mov    -0xbc8(%rbp),%eax      # move temp to eax
+    1353:	3b 85 3c f4 ff ff    	cmp    -0xbc4(%rbp),%eax      # compare temp and local_var1
+    1359:	7c ce                	jl     1329 <main+0x10e>      # while(temp<local_var1)
+    135b:	8b 85 d0 f5 ff ff    	mov    -0xa30(%rbp),%eax      # array[100] because array[0] is at 0xbc0
+    1361:	89 c6                	mov    %eax,%esi              # preparing for printf, second argument
     1363:	48 8d 05 cb 0c 00 00 	lea    0xccb(%rip),%rax        # 2035 <_IO_stdin_used+0x35>
-    136a:	48 89 c7             	mov    %rax,%rdi
-    136d:	b8 00 00 00 00       	mov    $0x0,%eax
-    1372:	e8 59 fd ff ff       	call   10d0 <printf@plt>
-    1377:	e9 a9 01 00 00       	jmp    1525 <main+0x30a>
-    137c:	83 bd 3c f4 ff ff 64 	cmpl   $0x64,-0xbc4(%rbp)
-    1383:	7e 2e                	jle    13b3 <main+0x198>
-    1385:	8b 85 3c f4 ff ff    	mov    -0xbc4(%rbp),%eax
-    138b:	89 c7                	mov    %eax,%edi
-    138d:	e8 6a fe ff ff       	call   11fc <gfunc>
+    136a:	48 89 c7             	mov    %rax,%rdi              # Message for printf statement loaded to rdi
+    136d:	b8 00 00 00 00       	mov    $0x0,%eax              # Clear eax 
+    1372:	e8 59 fd ff ff       	call   10d0 <printf@plt>      # printf("Some message:%d", ???);
+    1377:	e9 a9 01 00 00       	jmp    1525 <main+0x30a>      # Jump to outside if blocks
+
+
+    137c:	83 bd 3c f4 ff ff 64 	cmpl   $0x64,-0xbc4(%rbp)     # compare local_var1 and 100
+    1383:	7e 2e                	jle    13b3 <main+0x198>      # jump to next else if
+    1385:	8b 85 3c f4 ff ff    	mov    -0xbc4(%rbp),%eax      # move local_var1 to eax
+    138b:	89 c7                	mov    %eax,%edi              # load to edi for passing to gfunc
+    138d:	e8 6a fe ff ff       	call   11fc <gfunc>           # gfunc(local_var1)
     1392:	8b 05 78 2c 00 00    	mov    0x2c78(%rip),%eax        # 4010 <gval>
-    1398:	89 c6                	mov    %eax,%esi
+    1398:	89 c6                	mov    %eax,%esi              # move global variable to esi for print statement
     139a:	48 8d 05 9b 0c 00 00 	lea    0xc9b(%rip),%rax        # 203c <_IO_stdin_used+0x3c>
-    13a1:	48 89 c7             	mov    %rax,%rdi
-    13a4:	b8 00 00 00 00       	mov    $0x0,%eax
-    13a9:	e8 22 fd ff ff       	call   10d0 <printf@plt>
-    13ae:	e9 72 01 00 00       	jmp    1525 <main+0x30a>
-    13b3:	83 bd 3c f4 ff ff 0a 	cmpl   $0xa,-0xbc4(%rbp)
-    13ba:	7e 6e                	jle    142a <main+0x20f>
-    13bc:	48 b8 45 45 43 53 36 	movabs $0x2f30393653434545,%rax
+    13a1:	48 89 c7             	mov    %rax,%rdi              # move the print value to rdi for print
+    13a4:	b8 00 00 00 00       	mov    $0x0,%eax              # clear eax
+    13a9:	e8 22 fd ff ff       	call   10d0 <printf@plt>      # call to printf
+    13ae:	e9 72 01 00 00       	jmp    1525 <main+0x30a>      # jump to outside else if 
+
+
+    13b3:	83 bd 3c f4 ff ff 0a 	cmpl   $0xa,-0xbc4(%rbp)      # compare local_var1 to 10
+    13ba:	7e 6e                	jle    142a <main+0x20f>      # jump to the next if
+    13bc:	48 b8 45 45 43 53 36 	movabs $0x2f30393653434545,%rax # char str1[]="EECS690/"
     13c3:	39 30 2f 
-    13c6:	48 ba 37 30 30 53 52 	movabs $0x455253303037,%rdx
+    13c6:	48 ba 37 30 30 53 52 	movabs $0x455253303037,%rdx   # char str2[] = "700SRE"
     13cd:	45 00 00 
-    13d0:	48 89 85 10 fc ff ff 	mov    %rax,-0x3f0(%rbp)
-    13d7:	48 89 95 18 fc ff ff 	mov    %rdx,-0x3e8(%rbp)
-    13de:	48 8d 95 20 fc ff ff 	lea    -0x3e0(%rbp),%rdx
-    13e5:	b8 00 00 00 00       	mov    $0x0,%eax
-    13ea:	b9 7b 00 00 00       	mov    $0x7b,%ecx
-    13ef:	48 89 d7             	mov    %rdx,%rdi
-    13f2:	f3 48 ab             	rep stos %rax,%es:(%rdi)
-    13f5:	48 8d 85 10 fc ff ff 	lea    -0x3f0(%rbp),%rax
-    13fc:	48 89 c7             	mov    %rax,%rdi
-    13ff:	e8 ac fc ff ff       	call   10b0 <strlen@plt>
-    1404:	8b 95 3c f4 ff ff    	mov    -0xbc4(%rbp),%edx
-    140a:	48 63 d2             	movslq %edx,%rdx
-    140d:	48 39 d0             	cmp    %rdx,%rax
-    1410:	0f 85 0f 01 00 00    	jne    1525 <main+0x30a>
+    13d0:	48 89 85 10 fc ff ff 	mov    %rax,-0x3f0(%rbp)      # move str1 to stack since local
+    13d7:	48 89 95 18 fc ff ff 	mov    %rdx,-0x3e8(%rbp)      # move str2 to stack since local
+    13de:	48 8d 95 20 fc ff ff 	lea    -0x3e0(%rbp),%rdx      # this is loading the string that will be used by rep stos
+    13e5:	b8 00 00 00 00       	mov    $0x0,%eax              # set char buffer
+    13ea:	b9 7b 00 00 00       	mov    $0x7b,%ecx             # char buffer goes to 123
+    13ef:	48 89 d7             	mov    %rdx,%rdi              # string is loaded to rdi for operation over string
+    13f2:	f3 48 ab             	rep stos %rax,%es:(%rdi)      # rep stos
+    13f5:	48 8d 85 10 fc ff ff 	lea    -0x3f0(%rbp),%rax      # load string for strlen operation
+    13fc:	48 89 c7             	mov    %rax,%rdi              # move string to rdi for calling conventions
+    13ff:	e8 ac fc ff ff       	call   10b0 <strlen@plt>      # function call to strlen
+    1404:	8b 95 3c f4 ff ff    	mov    -0xbc4(%rbp),%edx      # load value of local_var1 to edx for operation
+    140a:	48 63 d2             	movslq %edx,%rdx              # sign extend to rdx
+    140d:	48 39 d0             	cmp    %rdx,%rax              # if(strlen(str3) == local_var1)
+    1410:	0f 85 0f 01 00 00    	jne    1525 <main+0x30a>      # jump out if not equal
     1416:	48 8d 05 26 0c 00 00 	lea    0xc26(%rip),%rax        # 2043 <_IO_stdin_used+0x43>
-    141d:	48 89 c7             	mov    %rax,%rdi
-    1420:	e8 7b fc ff ff       	call   10a0 <puts@plt>
-    1425:	e9 fb 00 00 00       	jmp    1525 <main+0x30a>
+    141d:	48 89 c7             	mov    %rax,%rdi              # move the string from lea to rdi for puts call
+    1420:	e8 7b fc ff ff       	call   10a0 <puts@plt>        # call to puts
+    1425:	e9 fb 00 00 00       	jmp    1525 <main+0x30a>      # jump to end of function
+
+
     142a:	83 bd 3c f4 ff ff 09 	cmpl   $0x9,-0xbc4(%rbp)
     1431:	0f 87 d2 00 00 00    	ja     1509 <main+0x2ee>
-    1437:	8b 85 3c f4 ff ff    	mov    -0xbc4(%rbp),%eax
-    143d:	48 8d 14 85 00 00 00 	lea    0x0(,%rax,4),%rdx
+    1437:	8b 85 3c f4 ff ff    	mov    -0xbc4(%rbp),%eax      # move local_var1 to eax
+    143d:	48 8d 14 85 00 00 00 	lea    0x0(,%rax,4),%rdx      # initalization of jump table?
     1444:	00 
     1445:	48 8d 05 10 0c 00 00 	lea    0xc10(%rip),%rax        # 205c <_IO_stdin_used+0x5c>
     144c:	8b 04 02             	mov    (%rdx,%rax,1),%eax
@@ -734,8 +747,8 @@ Disassembly of section .text:
     1458:	48 01 d0             	add    %rdx,%rax
     145b:	3e ff e0             	notrack jmp *%rax
     145e:	8b 85 3c f4 ff ff    	mov    -0xbc4(%rbp),%eax
-    1464:	89 85 34 f4 ff ff    	mov    %eax,-0xbcc(%rbp)
-    146a:	e9 9a 00 00 00       	jmp    1509 <main+0x2ee>
+    1464:	89 85 34 f4 ff ff    	mov    %eax,-0xbcc(%rbp)      # new variable last = local_var
+    146a:	e9 9a 00 00 00       	jmp    1509 <main+0x2ee>      # switch case
     146f:	8b 85 3c f4 ff ff    	mov    -0xbc4(%rbp),%eax
     1475:	83 c0 01             	add    $0x1,%eax
     1478:	89 85 34 f4 ff ff    	mov    %eax,-0xbcc(%rbp)
@@ -771,14 +784,14 @@ Disassembly of section .text:
     14fa:	8b 85 3c f4 ff ff    	mov    -0xbc4(%rbp),%eax
     1500:	83 c0 09             	add    $0x9,%eax
     1503:	89 85 34 f4 ff ff    	mov    %eax,-0xbcc(%rbp)
-    1509:	8b 85 34 f4 ff ff    	mov    -0xbcc(%rbp),%eax
-    150f:	89 c6                	mov    %eax,%esi
+    1509:	8b 85 34 f4 ff ff    	mov    -0xbcc(%rbp),%eax      # move last to eax
+    150f:	89 c6                	mov    %eax,%esi              # move eax to esi to prepare for printf
     1511:	48 8d 05 3b 0b 00 00 	lea    0xb3b(%rip),%rax        # 2053 <_IO_stdin_used+0x53>
-    1518:	48 89 c7             	mov    %rax,%rdi
-    151b:	b8 00 00 00 00       	mov    $0x0,%eax
-    1520:	e8 ab fb ff ff       	call   10d0 <printf@plt>
-    1525:	b8 00 00 00 00       	mov    $0x0,%eax
-    152a:	48 8b 55 f8          	mov    -0x8(%rbp),%rdx
+    1518:	48 89 c7             	mov    %rax,%rdi              # put the string from lea to rdi for printf
+    151b:	b8 00 00 00 00       	mov    $0x0,%eax              # clear eax
+    1520:	e8 ab fb ff ff       	call   10d0 <printf@plt>      # call to printf
+    1525:	b8 00 00 00 00       	mov    $0x0,%eax              # clear eax
+    152a:	48 8b 55 f8          	mov    -0x8(%rbp),%rdx        # clearing of stack
     152e:	64 48 2b 14 25 28 00 	sub    %fs:0x28,%rdx
     1535:	00 00 
     1537:	74 05                	je     153e <main+0x323>
