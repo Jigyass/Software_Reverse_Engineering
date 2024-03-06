@@ -1,0 +1,122 @@
+#################### START OF ANSWER 2 ####################
+
+
+1. Examine the hokky and tokky files using "file $filename"
+2. hokky is a ELF LSB pie executable and tokky is a ELF LSB shared object.
+
+
+3. The outputs from file indicates that hokky is the program to run tokky is the shared object.
+
+
+4. Examine the permissions for hokky using "ls -l". Since the permissions do not include execute permissions, use "chmod +x $file_path/filename" to change permissions to execute.
+
+
+5. Use "ldd hokky" to check if all the shared objects are found, if not check for missing libraries. Since libtokky.so is missing and we have a shared object file in tokky, rename tokky to "libtokky.so" using "mv $oldfile $newfilename"
+
+
+6. Run hokky using "./hokky"
+
+
+7. hokky prints "EECS 700 SRE\n ctf{Reached shared function}"
+8. Flag captured
+
+
+#################### END OF ANSWER 2 ####################
+
+#################### START OF ANSWER 3 ####################
+
+
+1. Start by using "objdump -D $prog_name > $file"
+2. Manually interpret the assembly code for checking conditions.
+
+
+3. Assembly indicates that password is being compared in a "check_passwd" function.
+
+
+4. Interpret the "check_passwd" function.
+
+
+5. "check_passwd" has two conditions for password to be valid that can be understood from two cmp statements that do not jump to leave.
+
+
+6. The first condition is string length must be 8, which can be interpretted by the first cmp statement which reads a value from %rax and compares it to $8. %rax contains the value from the call to <strlen@plt>.
+
+
+7. The second condition is another compare that checks the lower 8 bits from %rax to 0x40.
+
+
+8. Before the second comparison, 0x4 is added, which moves the address in the %rax to the 5th position in the string.
+
+
+9. Therefore, the string should be of length 8 and the 5th positio should be ASCII 0x40 (or) Hex 0x40.
+
+
+10. Upon, trial and error, the the value at 5th position should be ASCII 0x40 which is "@".
+
+
+11. Therefore, the string for the password should be "____@___".
+
+
+Password: jigy@s08
+
+
+Interpretted Object Dump:
+
+
+000000000000081a <check_passwd>:
+ 81a:   55                      push   %rbp
+ 81b:   48 89 e5                mov    %rsp,%rbp
+ 81e:   48 83 ec 10             sub    $0x10,%rsp              #Assign a space of 16 on the stack
+ 822:   48 89 7d f8             mov    %rdi,-0x8(%rbp)         #Move address argv from rdi to stack 0x8(var 1)
+ 826:   48 8b 45 f8             mov    -0x8(%rbp),%rax         #Move var1 to rax
+ 82a:   48 89 c7                mov    %rax,%rdi               #Move rax to rdi for calling conventions
+ 82d:   e8 7e fe ff ff          call   6b0 <strlen@plt>        #Check string length of var1 and return to rax
+ 832:   48 83 f8 08             cmp    $0x8,%rax               #Check if var1 == 8
+ 836:   74 07                   je     83f <check_passwd+0x25> #If var1=8 jmp to 83f
+ 838:   b8 00 00 00 00          mov    $0x0,%eax               #set eax to null
+ 83d:   eb 1b                   jmp    85a <check_passwd+0x40> #Jump to leave function
+ 83f:   48 8b 45 f8             mov    -0x8(%rbp),%rax         #var1 to rax
+ 843:   48 83 c0 04             add    $0x4,%rax               #Add 4 to rax, address of argv[5
+ 847:   0f b6 00                movzbl (%rax),%eax             #Zero extend to 32bit
+ 84a:   3c 40                   cmp    $0x40,%al               #Compare 64 to lower 8 bits of rax
+ 84c:   74 07                   je     855 <check_passwd+0x3b> #Jump to 855 if equal
+ 84e:   b8 00 00 00 00          mov    $0x0,%eax               #Set eax to null
+ 853:   eb 05                   jmp    85a <check_passwd+0x40> #Jump to leave
+ 855:   b8 01 00 00 00          mov    $0x1,%eax               #Move 1 to eax, Probably return 1
+ 85a:   c9                      leave
+ 85b:   c3                      ret
+
+000000000000085c <main>:
+ 85c:   55                      push   %rbp
+ 85d:   48 89 e5                mov    %rsp,%rbp
+ 860:   48 81 ec 90 00 00 00    sub    $0x90,%rsp              #Assign a space of 144 on the stack
+ 867:   89 bd 7c ff ff ff       mov    %edi,-0x84(%rbp)        #Move argc to 0x84
+ 86d:   48 89 b5 70 ff ff ff    mov    %rsi,-0x90(%rbp)        #Move argv to 0x90
+ 874:   64 48 8b 04 25 28 00    mov    %fs:0x28,%rax
+ 87b:   00 00
+ 87d:   48 89 45 f8             mov    %rax,-0x8(%rbp)
+ 881:   31 c0                   xor    %eax,%eax
+ 883:   83 bd 7c ff ff ff 02    cmpl   $0x2,-0x84(%rbp)        #Compare argc to 2
+ 88a:   74 2a                   je     8b6 <main+0x5a>         #Jump to 0x8b6 if is equal
+ 88c:   48 8b 05 ad 07 20 00    mov    0x2007ad(%rip),%rax        # 201040 <stderr@GLIBC_2.2.5>
+ 893:   48 89 c1                mov    %rax,%rcx
+ 896:   ba 1f 00 00 00          mov    $0x1f,%edx
+ 89b:   be 01 00 00 00          mov    $0x1,%esi
+ 8a0:   48 8d 3d 39 01 00 00    lea    0x139(%rip),%rdi        # 9e0 <_IO_stdin_used+0x20>
+ 8a7:   e8 44 fe ff ff          call   6f0 <fwrite@plt>
+ 8ac:   bf 00 00 00 00          mov    $0x0,%edi
+ 8b1:   e8 2a fe ff ff          call   6e0 <exit@plt>
+ 8b6:   48 8b 85 70 ff ff ff    mov    -0x90(%rbp),%rax        #Mov argv to rax
+ 8bd:   48 83 c0 08             add    $0x8,%rax               #Move the pointer to argv
+ 8c1:   48 8b 00                mov    (%rax),%rax             #moves the argv to rax
+ 8c4:   48 89 c7                mov    %rax,%rdi               #moves argv to rdi for calling conventions
+ 8c7:   e8 4e ff ff ff          call   81a <check_passwd>      #call to check_passwd where rdi holds the argument, essentially argv
+ 8cc:   89 45 8c                mov    %eax,-0x74(%rbp)        #Move eax to stack
+ 8cf:   83 7d 8c 00             cmpl   $0x0,-0x74(%rbp)        #Compare eax to 0
+ 8d3:   74 24                   je     8f9 <main+0x9d>         # JUMP to leave???
+ 8d5:   48 8b 15 34 07 20 00    mov    0x200734(%rip),%rdx        # 201010 <CTF>
+ 8dc:   48 8b 05 3d 07 20 00    mov    0x20073d(%rip),%rax        # 201020 <stdout@GLIBC_2.2.5>
+ 8e3:   48 8d 35 16 01 00 00    lea    0x116(%rip),%rsi        # a00 <_IO_stdin_used+0x40>
+
+
+#################### END OF ANSWER 3 ####################
