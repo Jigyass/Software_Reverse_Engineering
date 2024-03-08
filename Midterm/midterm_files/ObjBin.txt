@@ -581,10 +581,12 @@ Disassembly of section .text:
     11cd:	55                   	push   %rbp
     11ce:	48 89 e5             	mov    %rsp,%rbp
     11d1:	48 83 ec 20          	sub    $0x20,%rsp
-    11d5:	89 7d ec             	mov    %edi,-0x14(%rbp)
-    11d8:	48 89 75 e0          	mov    %rsi,-0x20(%rbp)
-    11dc:	83 7d ec 01          	cmpl   $0x1,-0x14(%rbp)   More than 1 arg
+    11d5:	89 7d ec             	mov    %edi,-0x14(%rbp)       #argc
+    11d8:	48 89 75 e0          	mov    %rsi,-0x20(%rbp)       #argv[]
+    11dc:	83 7d ec 01          	cmpl   $0x1,-0x14(%rbp)       #More than 1 arg
     11e0:	7f 2d                	jg     120f <main+0x46>
+
+#EXIT CODE
     11e2:	48 8b 05 37 2e 00 00 	mov    0x2e37(%rip),%rax        # 4020 <stderr@GLIBC_2.2.5>
     11e9:	48 89 c1             	mov    %rax,%rcx
     11ec:	ba 23 00 00 00       	mov    $0x23,%edx
@@ -595,16 +597,18 @@ Disassembly of section .text:
     1205:	bf ff ff ff ff       	mov    $0xffffffff,%edi
     120a:	e8 b1 fe ff ff       	call   10c0 <exit@plt>
 
+#ARG GREATER THAN 1 
+    120f:	48 8b 45 e0          	mov    -0x20(%rbp),%rax    #Move argv to rax
+    1213:	48 83 c0 08          	add    $0x8,%rax           #argv+8
+    1217:	48 8b 00             	mov    (%rax),%rax         #8th position of the string
+    121a:	48 89 c7             	mov    %rax,%rdi           #argv[8] to rdi for atoi call
+    121d:	e8 8e fe ff ff       	call   10b0 <atoi@plt>     #argv[8] to integer
+    1222:	89 45 fc             	mov    %eax,-0x4(%rbp)     #var1 = atoi(argv[8])
+    1225:	c7 45 f8 00 00 00 00 	movl   $0x0,-0x8(%rbp)     #long var2 = 0
+    122c:	c7 45 f4 00 00 00 00 	movl   $0x0,-0xc(%rbp)     #long var3 = 0
+    1233:	eb 27                	jmp    125c <main+0x93>    
 
-    120f:	48 8b 45 e0          	mov    -0x20(%rbp),%rax
-    1213:	48 83 c0 08          	add    $0x8,%rax
-    1217:	48 8b 00             	mov    (%rax),%rax
-    121a:	48 89 c7             	mov    %rax,%rdi
-    121d:	e8 8e fe ff ff       	call   10b0 <atoi@plt>   #is integer
-    1222:	89 45 fc             	mov    %eax,-0x4(%rbp)
-    1225:	c7 45 f8 00 00 00 00 	movl   $0x0,-0x8(%rbp)
-    122c:	c7 45 f4 00 00 00 00 	movl   $0x0,-0xc(%rbp)
-    1233:	eb 27                	jmp    125c <main+0x93>
+
     1235:	48 8b 15 d4 2d 00 00 	mov    0x2dd4(%rip),%rdx        # 4010 <phrase>
     123c:	8b 45 f4             	mov    -0xc(%rbp),%eax
     123f:	48 98                	cltq   
@@ -616,7 +620,6 @@ Disassembly of section .text:
     1251:	09 45 f8             	or     %eax,-0x8(%rbp)
     1254:	c1 65 f8 08          	shll   $0x8,-0x8(%rbp)  
     1258:	83 45 f4 01          	addl   $0x1,-0xc(%rbp)
-    
     
 
     125c:	48 8b 15 ad 2d 00 00 	mov    0x2dad(%rip),%rdx        # 4010 <phrase>
