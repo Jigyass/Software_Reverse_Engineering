@@ -7,7 +7,7 @@
 7. Attempt to interpret the starting of the assembly code
 8. Run "gdb ./$progname" to run program with some information to capture the flag
 9. Use gdb commands to find the flag 
-
+10. use ltrace(or)strace ./$prog ___ ___ to check for some useful runtime info
 
 
 
