@@ -8,7 +8,9 @@
 8. Run "gdb ./$progname" to run program with some information to capture the flag
 9. Use gdb commands to find the flag 
 10. use ltrace(or)strace ./$prog ___ ___ to check for some useful runtime info
-
+11. Use *0xADDR for referencing static addressess
+12. p print from reg
+13. x print from addr
 
 
 //Conventions
