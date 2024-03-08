@@ -1,0 +1,17 @@
+nm -D ./progname //Use to find dynamic symbols in stripped binary
+FLAGS
+--demangle if function overloading is used
+
+#END FLAGS
+
+strings $progname //List more than 4 consecutive ASCII characters
+
+#END FLAGS
+
+objdump 
+FLAGS
+-d machine instructions
+-D disassemble 
+-f file headers
+-s -j .rodata //display that section of the binary
+
