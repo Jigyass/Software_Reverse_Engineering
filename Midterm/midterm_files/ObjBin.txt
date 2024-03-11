@@ -608,6 +608,7 @@ Disassembly of section .text:
     122c:	c7 45 f4 00 00 00 00 	movl   $0x0,-0xc(%rbp)     #long var3 = 0
     1233:	eb 27                	jmp    125c <main+0x93>    
 
+#LOOPS THROUGH THE ENTIRE STRING
 
     1235:	48 8b 15 d4 2d 00 00 	mov    0x2dd4(%rip),%rdx        # 4010 <phrase>
     123c:	8b 45 f4             	mov    -0xc(%rbp),%eax
@@ -620,8 +621,6 @@ Disassembly of section .text:
     1251:	09 45 f8             	or     %eax,-0x8(%rbp)
     1254:	c1 65 f8 08          	shll   $0x8,-0x8(%rbp)  
     1258:	83 45 f4 01          	addl   $0x1,-0xc(%rbp)
-    
-
     125c:	48 8b 15 ad 2d 00 00 	mov    0x2dad(%rip),%rdx        # 4010 <phrase>
     1263:	8b 45 f4             	mov    -0xc(%rbp),%eax
     1266:	48 98                	cltq   
@@ -629,6 +628,8 @@ Disassembly of section .text:
     126b:	0f b6 00             	movzbl (%rax),%eax
     126e:	84 c0                	test   %al,%al
     1270:	75 c3                	jne    1235 <main+0x6c>
+
+
     1272:	8b 45 f8             	mov    -0x8(%rbp),%eax
     1275:	3b 45 fc             	cmp    -0x4(%rbp),%eax
     1278:	75 1b                	jne    1295 <main+0xcc>
