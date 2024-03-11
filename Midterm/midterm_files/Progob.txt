@@ -426,8 +426,10 @@ SWitch case
   4011ef:	25 ff 00 00 00       	and    $0xff,%eax
   4011f4:	89 85 f8 fd ff ff    	mov    %eax,-0x208(%rbp)
   4011fa:	83 bd f8 fd ff ff 31 	cmpl   $0x31,-0x208(%rbp)
-  401201:	7f 09                	jg     40120c <main+0xc6>
+  401201:	7f 09                	jg     40120c <main+0xc6>            #POSSIBLE BREAK
   401203:	83 85 f8 fd ff ff 01 	addl   $0x1,-0x208(%rbp)
+
+
   40120a:	eb 15                	jmp    401221 <main+0xdb>
   40120c:	83 85 f4 fd ff ff 01 	addl   $0x1,-0x20c(%rbp)
   401213:	8b 85 f4 fd ff ff    	mov    -0x20c(%rbp),%eax
@@ -437,6 +439,8 @@ SWitch case
 
   401221:	83 bd f8 fd ff ff 07 	cmpl   $0x7,-0x208(%rbp)
   401228:	0f 87 ad 00 00 00    	ja     4012db <main+0x195>
+
+
   40122e:	8b 85 f8 fd ff ff    	mov    -0x208(%rbp),%eax
   401234:	48 8d 14 85 00 00 00 	lea    0x0(,%rax,4),%rdx
   40123b:	00 
