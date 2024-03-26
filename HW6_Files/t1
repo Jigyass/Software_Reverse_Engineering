@@ -1,0 +1,80 @@
+
+asm_small:     file format elf64-x86-64
+
+
+Disassembly of section .text:
+
+0000000000401000 <correct_func>:
+  401000:	b8 01 00 00 00       	mov    $0x1,%eax
+  401005:	bf 01 00 00 00       	mov    $0x1,%edi
+  40100a:	48 be 16 20 40 00 00 	movabs $0x402016,%rsi
+  401011:	00 00 00 
+  401014:	ba 09 00 00 00       	mov    $0x9,%edx
+  401019:	0f 05                	syscall 
+  40101b:	b8 3c 00 00 00       	mov    $0x3c,%eax
+  401020:	bf 00 00 00 00       	mov    $0x0,%edi
+  401025:	0f 05                	syscall 
+  401027:	c3                   	ret    
+
+0000000000401028 <_start>:
+  401028:	b8 01 00 00 00       	mov    $0x1,%eax
+  40102d:	bf 01 00 00 00       	mov    $0x1,%edi
+  401032:	48 be 00 20 40 00 00 	movabs $0x402000,%rsi
+  401039:	00 00 00 
+  40103c:	ba 16 00 00 00       	mov    $0x16,%edx
+  401041:	0f 05                	syscall 
+  401043:	b8 00 00 00 00       	mov    $0x0,%eax
+  401048:	bf 00 00 00 00       	mov    $0x0,%edi
+  40104d:	48 be 31 20 40 00 00 	movabs $0x402031,%rsi
+  401054:	00 00 00 
+  401057:	ba 10 00 00 00       	mov    $0x10,%edx
+  40105c:	0f 05                	syscall 
+  40105e:	48 bf 26 20 40 00 00 	movabs $0x402026,%rdi
+  401065:	00 00 00 
+  401068:	48 be 31 20 40 00 00 	movabs $0x402031,%rsi
+  40106f:	00 00 00 
+  401072:	b9 0b 00 00 00       	mov    $0xb,%ecx
+  401077:	f3 a6                	repz cmpsb %es:(%rdi),%ds:(%rsi)
+  401079:	74 85                	je     401000 <correct_func>
+  40107b:	b8 01 00 00 00       	mov    $0x1,%eax
+  401080:	bf 01 00 00 00       	mov    $0x1,%edi
+  401085:	48 be 1f 20 40 00 00 	movabs $0x40201f,%rsi
+  40108c:	00 00 00 
+  40108f:	ba 07 00 00 00       	mov    $0x7,%edx
+  401094:	0f 05                	syscall 
+  401096:	b8 3c 00 00 00       	mov    $0x3c,%eax
+  40109b:	bf 00 00 00 00       	mov    $0x0,%edi
+  4010a0:	0f 05                	syscall 
+
+Disassembly of section .data:
+
+0000000000402000 <msg1>:
+  402000:	45 6e                	rex.RB outsb %ds:(%rsi),(%dx)
+  402002:	74 65                	je     402069 <_end+0x31>
+  402004:	72 20                	jb     402026 <passwd>
+  402006:	79 6f                	jns    402077 <_end+0x3f>
+  402008:	75 72                	jne    40207c <_end+0x44>
+  40200a:	20 70 61             	and    %dh,0x61(%rax)
+  40200d:	73 73                	jae    402082 <_end+0x4a>
+  40200f:	77 6f                	ja     402080 <_end+0x48>
+  402011:	72 64                	jb     402077 <_end+0x3f>
+  402013:	3a 20                	cmp    (%rax),%ah
+	...
+
+0000000000402016 <correct>:
+  402016:	43 6f                	rex.XB outsl %ds:(%rsi),(%dx)
+  402018:	72 72                	jb     40208c <_end+0x54>
+  40201a:	65 63 74 21 0a       	movsxd %gs:0xa(%rcx,%riz,1),%esi
+
+000000000040201f <wrong>:
+  40201f:	57                   	push   %rdi
+  402020:	72 6f                	jb     402091 <_end+0x59>
+  402022:	6e                   	outsb  %ds:(%rsi),(%dx)
+  402023:	67 21 0a             	and    %ecx,(%edx)
+
+0000000000402026 <passwd>:
+  402026:	73 75                	jae    40209d <_end+0x65>
+  402028:	70 65                	jo     40208f <_end+0x57>
+  40202a:	72 73                	jb     40209f <_end+0x67>
+  40202c:	65 63 72 65          	movsxd %gs:0x65(%rdx),%esi
+  402030:	74                   	.byte 0x74

@@ -1,0 +1,29 @@
+Notes:
+
+1. asm_small
+   Goal: Enter the "Correct!" password.
+   Execution Format: ./asm_small
+   
+   The code is in the ".code" section. Data is in ".data" section.
+   You may need to refer the x86-64-Linux system call calling conventions,
+   and the list of x86-64-Linux system call numbers.
+
+   Below is the relevant information about x86-64-Linux system call calling
+   conventions for this homework:
+   (a) Arguments to system call are passed in registers: %rdi, %rsi, %rdx,
+   %r10, %r8 and %r9.
+   (b) A system-call is done via the syscall instruction.
+   (c) The return value from the syscall is in the %rax register.
+   (d) The number of the syscall is passed in register %rax.
+
+   List of syscall numbers can be found here:
+   https://blog.rchapman.org/posts/Linux_System_Call_Table_for_x86_64/
+
+2. serial_gen
+   Goal: Enter a "Good Serial" number.
+   Execution format: ./serial_gen <serial code>
+   
+   'argv' is an array of pointers. Each pointer is 8 bytes on 64-bit
+   machines.
+   Integers are stored in a machine in 2's complement notation.
+
