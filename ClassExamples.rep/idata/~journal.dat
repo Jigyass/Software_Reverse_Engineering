@@ -1,0 +1,4 @@
+IADD:00000002:/variables.exe
+IDSET:/variables.exe:7f001f3ba12980894529972
+IADD:00000003:/func.exe
+IDSET:/func.exe:7f001f66b13641194952211
