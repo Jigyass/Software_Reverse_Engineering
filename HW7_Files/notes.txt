@@ -1,0 +1,13 @@
+HW6 Notes:
+Goal: Get further practice with reverse engineering binaries.
+
+1. bin1
+   Goal is to determine or guess the password.
+   Execution Format: $ ./bin1 <password>
+   Correct output: "password OK"
+
+2. bin2
+   Goal is to get the program to reveal the "flag".
+   Note that this is a 32-bit x86 program.
+   Execution format: $ ./bin2
+   Desired output: "flag{......}"
