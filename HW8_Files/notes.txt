@@ -1,0 +1,15 @@
+You are given three binary executables. You can run all the binaries. All the
+binaries are stripped.
+
+Although stripped, advanced RE tools still do a good job of finding the
+function boundaries. Since symbols are unavailable, the RE tools assign
+'some' names to each function.
+Also remember that the code is typically present in the .text section,
+read-only data like constant string values are present in the .rodata
+section, and global variables are present in the .data section.
+
+You may use any available static or dynamic tool at your disposal. You are
+also allowed to manipulate the binary files or update dynamic program state
+as you see fit to achieve your goals for this homework.
+
+Good luck!
