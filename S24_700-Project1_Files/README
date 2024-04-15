@@ -1,0 +1,22 @@
+Project 1: This project is only for students in the 700 section of this
+class.
+
+For this project, your task is to write a program that can do the following.
+The program should run on the EECS "cycle" servers. I will test your program
+on one of those machines.
+
+All relevant information about the ELF binary layout with useful structure
+definitions, etc. are in the manual page for "elf". You can get the elf
+manual from the Linux command-line using:
+$ man elf
+
+Alternatively, the "elf" manual is available here:
+https://man7.org/linux/man-pages/man5/elf.5.html
+
+Program tasks:
+    Recognize whether the given file is a 64-bit ELF-binary and then identify
+    the "Machine" and "Entry point address".
+    Print an error message if the file given is not a 64-bit ELF Linux
+    binary.
+    Examine the section information, and print relevant information about
+    each section.
