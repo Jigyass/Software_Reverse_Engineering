@@ -1,7 +1,3 @@
-/* Compile: gcc -o Script Script.c
- * Run: ./Script <filename>
- */
-
 /*
  * @author: Jigyas Sharma
  * @course: Software Reverse Engineering
