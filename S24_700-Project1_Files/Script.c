@@ -1,10 +1,42 @@
+/*
+ * @author: Jigyas Sharma
+ * @course: Software Reverse Engineering
+ * @description: This script takes a file as an input and if the file is an ELF Binary, then it prints out information regarding the file, else it prints an error
+ */
+
+//Library Import
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <elf.h>
 
-void display_section_details(Elf64_Shdr *sections, char *names, int index) {
-    printf("\nSection %d: %s\n", index, &names[sections[index].sh_name]);
+/*
+ * @param: null
+ * @ret: null
+ * @desc: This function just clears the terminal screen for a better viewing experience
+ */
+void clear_screen() 
+{
+    system("clear"); // use system("cls") if on windows
+}
+
+/*
+ * @param: 
+ * 	pointer = *section(Pointer to an array of information about ELF Sections)
+ * 	pointer = *names(Pointer to an array containing section names)
+ * 	integer = index(Index in the array for the section to be displayed)
+ * 	unsigned integer = machine(Value represents machine architecture)
+ * 	unsigned long integer = entry_point(Address of the entry point of the executable)
+ * @ret: null
+ * @desc: This function displays the details of the specific ELF section from the file that is being analyzed.
+ */
+void display_section_details(Elf64_Shdr *sections, char *names, int index, unsigned machine, unsigned long entry_point) {
+    clear_screen();
+    printf("ELF 64-bit Header:\n");
+    printf("  Machine: %u\n", machine);
+    printf("  Entry point address: 0x%lx\n\n", entry_point);
+
+    printf("Section %d: %s\n", index, &names[sections[index].sh_name]);
     printf("  Address: 0x%lx\n", sections[index].sh_addr);
     printf("  Permissions: %c%c%c\n",
            (sections[index].sh_flags & SHF_WRITE) ? 'W' : '-',
@@ -12,6 +44,8 @@ void display_section_details(Elf64_Shdr *sections, char *names, int index) {
            (sections[index].sh_flags & SHF_EXECINSTR) ? 'X' : '-');
 }
 
+/*
+ * @param:
 int process_elf(const char *filename) {
     FILE *file = fopen(filename, "rb");
     if (!file) {
@@ -31,10 +65,6 @@ int process_elf(const char *filename) {
         fclose(file);
         return EXIT_FAILURE;
     }
-
-    printf("ELF 64-bit Header:\n");
-    printf("  Machine: %u\n", header.e_machine);
-    printf("  Entry point address: 0x%lx\n", header.e_entry);
 
     Elf64_Shdr *sections = malloc(header.e_shentsize * header.e_shnum);
     if (!sections) {
@@ -64,8 +94,8 @@ int process_elf(const char *filename) {
         int index = 0;
         char command[10];
         while (1) {
-            display_section_details(sections, names, index);
-            printf("Type 'next' or 'prev' to navigate, 'exit' to finish: ");
+            display_section_details(sections, names, index, header.e_machine, header.e_entry);
+            printf("Type 'next', 'prev' to navigate, 'exit' to finish: ");
             scanf("%9s", command);
             
             if (strcmp(command, "next") == 0 && index < header.e_shnum - 1) {
@@ -86,7 +116,7 @@ int process_elf(const char *filename) {
 
 int main(int argc, char *argv[]) {
     if (argc != 2) {
-        fprintf(stderr, "Usage: %s <ELF-file>\n", argv[0]);
+        fprintf(stderr, "Correct Usage: %s <ELF-file>\n", argv[0]);
         return EXIT_FAILURE;
     }
 
