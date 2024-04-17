@@ -9,6 +9,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include <elf.h>
+#include <ctype.h>
+#include <unistd.h>
 
 /*
  * @param: null
@@ -32,7 +34,6 @@ void clear_screen()
  */
 void DisplaySection(Elf64_Shdr *sections, char *names, int index, unsigned machine, unsigned long entry_point) 
 {
-    clear_screen();
     printf("ELF 64-bit Header:\n");
     printf("  Machine: %u\n", machine);
     printf("  Entry point address: 0x%lx\n\n", entry_point);
@@ -94,22 +95,49 @@ int process_elf(const char *filename)
 
     char response[10];
     printf("This is a valid ELF Binary!\n");
-    printf("Do you want to view section details? (yes/no): ");
+    printf("Type \"all\" to view all section information at once or \"view\" to go through each section yourself: ");
     scanf("%9s", response);
 
-    if (strcmp(response, "yes") == 0) {
+    if (strcmp(response, "all") == 0) 
+    {
+        for (int i = 0; i < header.e_shnum; i++) 
+        {
+            DisplaySection(sections, names, i, header.e_machine, header.e_entry);
+        }
+    } 
+    else if (strcmp(response, "view") == 0) 
+    {
         int index = 0;
         char command[10];
-        while (1) {
+        while (1) 
+        {
+            clear_screen();
             DisplaySection(sections, names, index, header.e_machine, header.e_entry);
-            printf("Type 'next', 'prev' to navigate, 'exit' to finish: ");
+            printf("Enter 'next', 'prev', a section number (0 to %d), or 'exit' to finish: ", header.e_shnum - 1);
             scanf("%9s", command);
             
-            if (strcmp(command, "next") == 0 && index < header.e_shnum - 1) {
+            if (strcmp(command, "next") == 0 && index < header.e_shnum - 1) 
+            {
                 index++;
-            } else if (strcmp(command, "prev") == 0 && index > 0) {
+            } 
+            else if (strcmp(command, "prev") == 0 && index > 0) 
+            {
                 index--;
-            } else if (strcmp(command, "exit") == 0) {
+            } 
+            else if (isdigit(command[0])) 
+            {
+                int new_index = atoi(command);
+                if (new_index >= 0 && new_index < header.e_shnum) 
+                {
+                    index = new_index;
+                } 
+                else 
+                {
+                    printf("Invalid section number! Please enter a number between 0 and %d.\n", header.e_shnum - 1);
+                }
+            } 
+            else if (strcmp(command, "exit") == 0) 
+            {
                 break;
             }
         }
