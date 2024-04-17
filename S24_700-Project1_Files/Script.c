@@ -30,7 +30,8 @@ void clear_screen()
  * @ret: null
  * @desc: This function displays the details of the specific ELF section from the file that is being analyzed.
  */
-void display_section_details(Elf64_Shdr *sections, char *names, int index, unsigned machine, unsigned long entry_point) {
+void DisplaySection(Elf64_Shdr *sections, char *names, int index, unsigned machine, unsigned long entry_point) 
+{
     clear_screen();
     printf("ELF 64-bit Header:\n");
     printf("  Machine: %u\n", machine);
@@ -45,8 +46,13 @@ void display_section_details(Elf64_Shdr *sections, char *names, int index, unsig
 }
 
 /*
- * @param:
-int process_elf(const char *filename) {
+ * @param: 
+ * 	pointer = *filename(Pointer to a string that holds the filename which was passed as an argument to the main function)
+ * @ret: integer = return EXIT_SUCCESS if the file is a ELF binary and the process information regarding the binary, else returns EXIT_FAILURE if the file is not an ELF Binary)
+ * @desc: This function processes a 64-bit ELF binary and then stores the information about the file which can be viewed using DisplaySection.
+ */ 
+int process_elf(const char *filename) 
+{
     FILE *file = fopen(filename, "rb");
     if (!file) {
         perror("Failed to open file");
@@ -87,6 +93,7 @@ int process_elf(const char *filename) {
     fread(names, 1, strtab.sh_size, file);
 
     char response[10];
+    printf("This is a valid ELF Binary!\n");
     printf("Do you want to view section details? (yes/no): ");
     scanf("%9s", response);
 
@@ -94,7 +101,7 @@ int process_elf(const char *filename) {
         int index = 0;
         char command[10];
         while (1) {
-            display_section_details(sections, names, index, header.e_machine, header.e_entry);
+            DisplaySection(sections, names, index, header.e_machine, header.e_entry);
             printf("Type 'next', 'prev' to navigate, 'exit' to finish: ");
             scanf("%9s", command);
             
@@ -114,7 +121,15 @@ int process_elf(const char *filename) {
     return EXIT_SUCCESS;
 }
 
-int main(int argc, char *argv[]) {
+/*
+ * @param:
+ *	integer = argc(Number of command line arguments)
+ *	pointer = *argv(Pointer to an array of strings that hold each argument as a string)
+ * @ret: int = returns EXIT_FAILURE if program is not run correctly, else inherits return from process_elf()
+ * @desc: This is the main function of the program, it checks the correct usage of the program and then passes the argument to the process_elf().
+ */
+int main(int argc, char *argv[]) 
+{
     if (argc != 2) {
         fprintf(stderr, "Correct Usage: %s <ELF-file>\n", argv[0]);
         return EXIT_FAILURE;
