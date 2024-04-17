@@ -57,6 +57,20 @@ void AllInfo(const Elf64_Ehdr *hdr)
     printf("  Section header string table index: %u\n", hdr->e_shstrndx);
 }
 
+/*
+ * @param:
+ *  pointer = *sections(Pointer to an Elf64_Shdr structure containing section information)
+ *  pointer = *names(Pointer to string array containing section names)
+ *  integer = num_sections(Number of sections that are in the ELF binary)
+ * @ret: null
+ * @desc: This function prints the names of all sections present in the ELF binary.
+ */
+void PrintAllSections(Elf64_Shdr *sections, char *names, int num_sections) {
+    printf("All Section Names:\n");
+    for (int i = 0; i < num_sections; i++) {
+        printf("Section: %s\n", &names[sections[i].sh_name]);
+    }
+}
 
 /*
  * @param: 
@@ -132,7 +146,7 @@ int process_elf(const char *filename)
     char response[10];
     printf("This is a valid ELF Binary!\n");
     AllInfo(&header);
-    printf("Type \"all\" to view all section information at once or \"view\" to go through each section yourself: ");
+    printf("Type \"all\" to view all section information at once or \"view\" to go through each section yourself or \"sections\" to print all section names: ");
     scanf("%9s", response);
 
     if (strcmp(response, "all") == 0) 
@@ -142,6 +156,10 @@ int process_elf(const char *filename)
             DisplaySection(sections, names, i, header.e_machine, header.e_entry);
         }
     } 
+    else if (strcmp(response, "sections") == 0)
+    {
+        PrintAllSections(sections, names, header.e_shnum);
+    }
     else if (strcmp(response, "view") == 0) 
     {
         int index = 0;
