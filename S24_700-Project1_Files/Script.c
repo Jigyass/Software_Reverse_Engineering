@@ -23,6 +23,42 @@ void clear_screen()
 }
 
 /*
+ * @param:
+ *  pointer = *hdr(Pointer to Elf64_Ehdr structure containing information about the elf binary)
+ * @ret: null
+ * @desc: This function prints all the information in the structure Elf64_Ehdr.
+ */
+void AllInfo(const Elf64_Ehdr *hdr) 
+{
+    printf("ELF Header Information:\n");
+    printf("  Magic:   ");
+    for (int i = 0; i < EI_NIDENT; i++) {
+        printf("%02x ", hdr->e_ident[i]);
+    }
+    printf("\n");
+
+    printf("  Class:                             %u\n", hdr->e_ident[EI_CLASS]);
+    printf("  Data:                              %u\n", hdr->e_ident[EI_DATA]);
+    printf("  Version:                           %u\n", hdr->e_ident[EI_VERSION]);
+    printf("  OS/ABI:                            %u\n", hdr->e_ident[EI_OSABI]);
+    printf("  ABI Version:                       %u\n", hdr->e_ident[EI_ABIVERSION]);
+    printf("  Type:                              %u\n", hdr->e_type);
+    printf("  Machine:                           %u\n", hdr->e_machine);
+    printf("  Version:                           0x%x\n", hdr->e_version);
+    printf("  Entry point address:               0x%lx\n", hdr->e_entry);
+    printf("  Start of program headers:          %lu (bytes into file)\n", hdr->e_phoff);
+    printf("  Start of section headers:          %lu (bytes into file)\n", hdr->e_shoff);
+    printf("  Flags:                             %u\n", hdr->e_flags);
+    printf("  Size of this header:               %u (bytes)\n", hdr->e_ehsize);
+    printf("  Size of program headers:           %u (bytes)\n", hdr->e_phentsize);
+    printf("  Number of program headers:         %u\n", hdr->e_phnum);
+    printf("  Size of section headers:           %u (bytes)\n", hdr->e_shentsize);
+    printf("  Number of section headers:         %u\n", hdr->e_shnum);
+    printf("  Section header string table index: %u\n", hdr->e_shstrndx);
+}
+
+
+/*
  * @param: 
  * 	pointer = *section(Pointer to an array of information about ELF Sections)
  * 	pointer = *names(Pointer to an array containing section names)
@@ -95,6 +131,7 @@ int process_elf(const char *filename)
 
     char response[10];
     printf("This is a valid ELF Binary!\n");
+    AllInfo(&header);
     printf("Type \"all\" to view all section information at once or \"view\" to go through each section yourself: ");
     scanf("%9s", response);
 
@@ -142,7 +179,11 @@ int process_elf(const char *filename)
             }
         }
     }
-
+    else
+    {
+        exit(0);
+    }
+    
     free(names);
     free(sections);
     fclose(file);
