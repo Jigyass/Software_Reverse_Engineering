@@ -1,0 +1,27 @@
+Q1. You are given a file, "structs.exe" along with the corresponding header
+file, structs.h.
+Update the types in Ghidra to get your "decompiler" view as close as possible
+to the image given to you in "structs.png".
+
+Q2: Write a Ghidra script that will, for each function print:
+(a) Name and start address
+(b) A count of the number of "MOV" instructions in the function
+
+Q3: Some functions in C are considered "dangerous" due to their inclination to
+cause memory errors. Programmers are discouraged from using these functions in their
+programs, yet these functions are widely used.
+You should write a Ghidra script to identify calls made by your program to "dangerous"
+C library functions. Find all places in the code where these functions are called.
+The list of dangerous functions is: "atoi", "gets", "strcpy", "strcat", "sprintf"
+I am giving you the "ispell" and "pgp" binaries to test your script.
+
+
+For each dangerous function, print your output in the form: <FN_Name>:<Addrss>
+For instance:
+Function strcpy is referenced from:  
+main:0x4199791,  main:0x4199804,  expandmode:0x4206884,  checkfile:0x4212682,
+Function sprintf is referenced from:  
+main:0x4202172,  main:0x4202365,  expandmode:0x4207539,
+...
+
+     
