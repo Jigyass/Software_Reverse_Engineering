@@ -22,6 +22,4 @@ Function strcpy is referenced from:
 main:0x4199791,  main:0x4199804,  expandmode:0x4206884,  checkfile:0x4212682,
 Function sprintf is referenced from:  
 main:0x4202172,  main:0x4202365,  expandmode:0x4207539,
-...
-
-     
+...     
