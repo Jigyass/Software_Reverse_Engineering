@@ -1,0 +1,76 @@
+Notes:
+
+1. Statically rewrite the binary "rewrite.exe" to solve the following
+challenges.
+You are given the program "elf_update.exe" to help you make updates to your
+binary program. Note that you are not required to use "elf_update.exe" to
+update the binary, you may use any binary editor (like emacs, etc.).
+If you opt to use "elf_update.exe" to rewrite your binary, then the format
+is:
+    Format: ./elf_update.exe <object file-name> <start location of
+             update in hex> <stream of new bytes to overwrite>
+
+For example, the binary, "rewrite.exe" is not currently correct because the
+magic "ELF" signature is corrupted.
+    $ ./rewrite.exe 
+    bash: ./rewrite.exe: cannot execute binary file: Exec format error
+
+To correct that, we can use elf_update.exe as follows:
+    $ ./elf_update.exe rewrite.exe 0 $(printf "\x7fELF")
+    Process Entry point: 0x5e0
+    write_offset = 0x0
+
+Now, if we run the binary again, we get:
+    $ ./rewrite.exe 
+    String is: Hello to Reverse Engineering
+    Number is: 1024
+
+Your task is to use binary rewriting to solve the following challenges:
+
+   a1. Update the binary using your program so the output is:
+   $ ./hw_st.exe
+   String is: Hello to Reverse Engineering
+   Number is: 64
+
+   a2. Next, Update the binary using your program so the output is:
+   $ ./hw_st.exe
+   String is: ctf{Updated_String}
+   Number is: 64
+
+   a3. Next, Update the binary using your program so the output is:
+   $ ./hw_st.exe
+   String is: New String
+   Number is: 64
+
+2. Simple example of using LD_PRELOAD
+   Problem: You are given a binary 'bin1'.
+   This binary contains a string, "Problem solved", that is reached when
+   certain conditions are met. Your goal is to reverse engineer those
+   conditions.
+   Then, use LD_PRELOAD to meet or bypass those conditions so the
+   string "Problem solved" present in the binary is printed.
+   (Remember, that the string from the binary must be printed.)
+   You are not allowed to use any other form of "patching" the binary.
+
+3. Use the ptrace API to get a count of the number of times each function in
+   the binary is reached.
+   (You only need to run the program on the 'sha' binary with the sha.fn file
+   for this HW).
+   
+   (a) You are given a working template program, ptrace_template.c, to start.
+   (b) You are also give a library of functions, libdb.so. This file contains:
+       (i) void insert(int addr, char *name)
+       	   Insert a new symbol with 'name' and 'addr in binary' in database.
+	   If the symbol is already present in the database, then only a
+   	   message is printed. Else, a new record will be created in the database.
+      (ii) void increment(int addr)
+      	   Increment count for the symbol at 'addr'. If there is no record
+	   for 'addr', then nothing is done and the function returns
+   	   cleanly.
+     (iii) void print_data()
+     	   Output all records in the database. This is the final output.
+	   
+   (c) You run the program as follows:
+       $> export LD_LIBRARY_PATH=.:$LD_LIBRARY_PATH
+       $> gcc ptrace_template.c -L./ -ldb
+       $> ./a.out sha.fn sha sha_small.in
