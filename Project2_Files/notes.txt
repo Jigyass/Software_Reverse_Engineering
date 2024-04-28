@@ -1,0 +1,65 @@
+Goal: Practice scripting and analyzing files in Ghidra
+
+Problem 1:
+You are given a C++ program binary, called prog.exe. You are also given the
+prog.h file, which contains the class definitions used. Your goal is to open
+the binary file in Ghidra and employ the techniques demonstrated in class to
+simplify the "decompiler" output.
+
+To help you, a screenshot of my decompiler listing is shown in the file
+"pk_screen_shot.png".
+Please note that your decompiler listing does not need to "match" my
+listing. But, try to understand the steps I followed, and apply them to your
+Ghidra representation. Some of the steps I performed, include:
+1. Create structure types for VTable A and VTable B
+2. Create structure types for Class A and Class B
+3. Update names and types of objA and objB.
+4. Other cleanup, like renaming/retyping pointer variables, loop induction
+variables, etc.
+
+Problem 2:
+ROP, which stands for Return-Oriented Programming, is a common security
+attack on C/C++ binaries.
+These attacks use small code sequences that already exist in the binary.
+The attacker finds such code sequences to generate an attack. These small
+code sequences are called "gadgets".
+
+A ROP Gadget is a single contiguous code fragment that typically ends in a
+"return" instruction (hence, called ROP), but may also end in some other
+instructions. Your goal is to write a script that will detect and print all
+ROP gadgets per function in the binary.
+For this project, a ROP gadget must be at least 2 instructions long.
+
+The set of allowed instructions in the ROP gadgets are the following:
+# Potential ROP Gadget instructions
+"NOP", "POP", "PUSH", "MOV", "ADD", "SUB", "MUL", "DIV", "XOR"
+# Potential ROP Gadget instructions with 0 operands
+"NOP"
+# Potential ROP Gadget instructions with 1 register operand
+"POP", "PUSH"
+# Potential ROP Gadget instructions with the fist operand a register
+"MOV", "ADD", "SUB", "MUL", "DIV", "XOR"
+
+# Instructions with 0 operands that can "end" a ROP Gadget
+"RET"
+# Instructions with only 1 "Register" operand that can "end" ROP Gadgets
+"JMP", "CALL"
+
+Your script should print the detected ROP gadgets for each function in the binary.
+
+For instance:
+HW_FindROPGadgets.py> Running...
+ROP Gadgets in Function: _init
+Gadget is:  "ADD RSP,0x8",  "RET",
+ROP Gadgets in Function: __do_global_dtors_aux
+Gadget is:  "POP RBP",  "RET",
+ROP Gadgets in Function: clearscreen
+Gadget is:  "NOP",  "POP RBP",  "RET",
+ROP Gadgets in Function: signon_msg
+Gadget is:  "NOP",  "ADD RSP,0x18",  "POP RBX",  "POP RBP",  "RET",
+ROP Gadgets in Function: main
+Gadget is:  "MOV EAX,EAX",  "MOV RAX,qword ptr [0x42d568 + RAX*0x8]",  "JMP RAX",
+ROP Gadgets in Function: initsigs
+Gadget is:  "NOP",  "POP RBP",  "RET",
+ROP Gadgets in Function: do_decrypt
+Gadget is:  "MOV EAX,0x0",  "ADD RSP,0x348",  "POP RBX",  "POP RBP",  "RET",
