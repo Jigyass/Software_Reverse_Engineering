@@ -21,6 +21,7 @@ int main(int argc, char *argv[])
   char str[MAXSTR], name[MAXSTR], t1[MAXSTR], ch;
   FILE *fp;
   struct user_regs_struct regs;
+  int count = 0;
 
   if(argc < 2){
     fprintf(stderr, "Program to use ptrace to find the number of times each function is reached at run-time\n");
@@ -33,6 +34,8 @@ int main(int argc, char *argv[])
     exit(0);
   }
 
+  //./a.out sha.fn sha sha_small.in
+  // set up breakpoint internally in the program everytime that function is reached, count the number of times it is called.
   /* scan the list of function addresses obtained through an external
      program, like Ghidra or nm */
   fgets(str, MAXSTR, fp);
@@ -40,10 +43,13 @@ int main(int argc, char *argv[])
 
     /* from 'nm' */
     if((t = sscanf(str, "%x %c %s", &addr, &ch, name)) == 3){
+      printf("addr: %d, name: %s", addr, name);
+
       if(ch=='t' || ch=='T'){
-	/* insert function in database */
-	insert(addr, name);
-      }
+	      /* insert function in database */
+	      insert(addr, name);
+        }
+
     }
     fgets(str, MAXSTR, fp);
   }
@@ -70,18 +76,16 @@ int main(int argc, char *argv[])
     /* code will break here on any interrupts */
     wait(&status);
     if(WIFEXITED(status)){
-
       /* Returns True if the child exited normally */
       fprintf(stdout, "The tracee program has exited with exit status %d\n", WEXITSTATUS(status));
       break;
     }
 
+    // -------------------------------------------------------------
     signo = WSTOPSIG(status); // Get the signal number
-
     if(signo == SIGTRAP) {
-      /* likely stopped due to the PTRACE singlestepping, or continue.
-	 Ignore. */
-      signo = 0;
+      /* likely stopped due to the PTRACE singlestepping, or continue. Ignore. */
+      printf("signumber: %d\n", signo);
     }
     else if((signo == SIGHUP) || (signo == SIGINT)) {
       ptrace(PTRACE_CONT, child, 0, signo);
@@ -92,8 +96,29 @@ int main(int argc, char *argv[])
       // do nothing
     }
 
-    ptrace(PTRACE_CONT, child, NULL, signo);
+    //long instruction = ptrace(PTRACE_SINGLESTEP, child, (void*)regs.rip, NULL);
+    //printf("rip: %lld, instruction: %ld\n", regs.rip, instruction);    
+    //ptrace(PTRACE_CONT, child, NULL, signo);
+    count++;  
+    ptrace(PTRACE_GETREGS, child, NULL, &regs);
+    unsigned long long int address = regs.rip;
+    increment(address);
+    ptrace(PTRACE_SINGLESTEP, child, NULL, signo); 
   }
-  
+  printf("------------------------\n");
+  printf("total ins: %d", count);
+  print_data();
   return 0;
 }
+
+/*
+addr: 4197472, name: byte_reverseNode byte_reverse at address 0x400c60 inserted in DB
+addr: 4196420, name: sha_transformNode sha_transform at address 0x400844 inserted in DB
+addr: 4196182, name: mainNode main at address 0x400756 inserted in DB
+addr: 4197965, name: sha_finalNode sha_final at address 0x400e4d inserted in DB
+addr: 4197627, name: sha_initNode sha_init at address 0x400cfb inserted in DB
+addr: 4198391, name: sha_printNode sha_print at address 0x400ff7 inserted in DB
+addr: 4198259, name: sha_streamNode sha_stream at address 0x400f73 inserted in DB
+addr: 4197724, name: sha_updateNode sha_update at address 0x400d5c inserted in DB
+addr: 4195952, name: _startNode _start at address 0x400670 inserted in DB
+*/
