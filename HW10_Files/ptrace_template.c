@@ -73,6 +73,7 @@ int main(int argc, char *argv[])
 
       /* Returns True if the child exited normally */
       fprintf(stdout, "The tracee program has exited with exit status %d\n", WEXITSTATUS(status));
+      print_data();
       break;
     }
 
@@ -81,18 +82,20 @@ int main(int argc, char *argv[])
     if(signo == SIGTRAP) {
       /* likely stopped due to the PTRACE singlestepping, or continue.
 	 Ignore. */
+      ptrace(PTRACE_GETREGS, child, NULL, &regs);
+      increment(regs.rip);
       signo = 0;
+      ptrace(PTRACE_SINGLESTEP, child, 0, 0);
     }
     else if((signo == SIGHUP) || (signo == SIGINT)) {
       ptrace(PTRACE_CONT, child, 0, signo);
       fprintf(stdout, "Child got a SIGHUP or SIGINT. We are done\n");
       break;
     }
-    else{
-      // do nothing
+    else
+    {
+      ptrace(PTRACE_CONT, child, NULL, signo);
     }
-
-    ptrace(PTRACE_CONT, child, NULL, signo);
   }
   
   return 0;
