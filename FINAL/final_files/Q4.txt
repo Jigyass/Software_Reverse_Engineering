@@ -1,0 +1,6 @@
+You are given the "ispell" binary. Write a Ghidra script to count the
+number of functions with 0 arguments.
+
+Answer the below questions in Canvas.
+1. How many functions satisfy the constraint?
+2. Attach your script.
